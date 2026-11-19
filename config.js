@@ -24,7 +24,7 @@ export const APP_CONFIG = {
   // 正式網址（GitHub Pages），用於產生投票連結與 QR Code。
   // 例："https://yourname.github.io/starlight-awards/"
   // 留空時自動使用目前網頁所在位置。
-  publicBaseUrl: ""
+  publicBaseUrl: "https://linyuwen630511-pixel.github.io/starlight-awards1/"
 };
 
 // 僅供「本機示範模式」使用的測試密碼（非安全驗證，正式模式不使用）
