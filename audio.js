@@ -170,6 +170,39 @@ export class StarAudio {
     }, 1.2);
   }
 
+
+  /** 音樂盒音色（輕鬆背景音樂用） */
+  musicBox(bus, t, midi, dur = 1.4, vel = 0.05) {
+    const c = this.ctx, g = c.createGain();
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vel, t + 0.005); g.gain.exponentialRampToValueAtTime(0.0006, t + dur);
+    g.connect(bus); g.connect(this.verb);
+    [[1, 1], [3, 0.18], [4.2, 0.07]].forEach(([mul, amp]) => {
+      const o = c.createOscillator(), a = c.createGain();
+      o.type = "sine"; o.frequency.value = mtof(midi) * mul; a.gain.value = amp;
+      o.connect(a).connect(g); o.start(t); o.stop(t + dur + 0.05);
+    });
+  }
+
+  /** 輕鬆背景音樂（原創）：Fmaj7 – Em7 – Dm7 – Cmaj7，84 BPM，音樂盒旋律＋柔和和弦＋輕沙鈴 */
+  playRelax() {
+    const CH = [[41, 57, 60, 64], [40, 55, 59, 62], [38, 53, 57, 60], [36, 52, 55, 59]];
+    const MEL = [
+      [77, 0, 76, 72, 0, 74, 72, 0], [71, 0, 72, 74, 0, 0, 67, 0], [69, 0, 72, 0, 74, 72, 69, 0], [67, 0, 64, 67, 72, 0, 0, 0],
+      [72, 0, 77, 0, 76, 0, 72, 0], [74, 0, 76, 74, 71, 0, 0, 0], [72, 0, 69, 72, 74, 0, 77, 0], [76, 0, 74, 0, 72, 0, 0, 0]
+    ].flat();
+    const eighth = 60 / 84 / 2;
+    this.startLoop("relax", eighth, 64, (bus, t, s) => {
+      const bar = Math.floor(s / 8), pos = s % 8, ch = CH[bar % 4];
+      if (pos === 0) {
+        ch.slice(1).forEach((m, i) => this.piano(bus, t + i * 0.035, m, 2.6, 0.03));
+        this.piano(bus, t, ch[0], 2.2, 0.06);
+      }
+      if (pos === 4) this.piano(bus, t, ch[0] + 7, 1.6, 0.035);
+      if (MEL[s]) this.musicBox(bus, t, MEL[s] + 12, 1.5, 0.035);
+      if (pos % 2 === 1) this.noise(bus, t, 0.05, { type: "highpass", freq: 7000, vel: 0.012 });
+    }, 2.5);
+  }
+
   // ---------- 音效 ----------
   sfx(fn) { if (!this.ensure()) return; fn(this.sfxBus, this.ctx.currentTime + 0.02); }
   click() { this.sfx((b, t) => this.piano(b, t, 88, 0.15, 0.05)); }

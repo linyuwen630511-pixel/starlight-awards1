@@ -2,6 +2,7 @@
 // 共用介面：主題、星光背景、提示、確認視窗、音效、須知渲染
 // ============================================================
 import { STATUS_LABEL } from "./rules.js";
+import { audio as starAudio } from "./audio.js";
 
 const THEME_KEY = "starlight-theme";
 const SOUND_KEY = "starlight-sound";
@@ -118,6 +119,24 @@ function syncSoundButtons() {
   });
 }
 
+// ---------------- 輕鬆背景音樂 ----------------
+const MUSIC_KEY = "starlight-relax";
+export const musicOn = () => { try { return localStorage.getItem(MUSIC_KEY) === "on"; } catch { return false; } };
+function syncMusicButtons() {
+  document.querySelectorAll('[data-ui="music"]').forEach((b) => {
+    b.classList.toggle("is-on", musicOn());
+    b.title = musicOn() ? "背景音樂：播放中（點擊關閉）" : "背景音樂：關閉（點擊播放）";
+    b.setAttribute("aria-pressed", String(musicOn()));
+  });
+}
+export function startRelax() { if (!musicOn()) return; starAudio.ensure(); starAudio.setBgm(true); starAudio.playRelax(); }
+function toggleMusic() {
+  const on = !musicOn();
+  try { localStorage.setItem(MUSIC_KEY, on ? "on" : "off"); } catch {}
+  if (on) startRelax(); else starAudio.stopBgm(1.2);
+  syncMusicButtons();
+}
+
 // ---------------- 共用外框 ----------------
 export function initChrome() {
   let t = "ivory";
@@ -125,9 +144,16 @@ export function initChrome() {
   applyTheme(t);
   initStarfield();
   syncSoundButtons();
+  syncMusicButtons();
+  // 瀏覽器限制自動播放：使用者先前開啟過音樂時，於第一次點擊畫面後開始播放
+  if (musicOn()) {
+    const kick = () => { startRelax(); removeEventListener("pointerdown", kick); removeEventListener("keydown", kick); };
+    addEventListener("pointerdown", kick); addEventListener("keydown", kick);
+  }
   document.addEventListener("click", (e) => {
     const b = e.target.closest("[data-ui]");
     if (!b) return;
+    if (b.dataset.ui === "music") { toggleMusic(); return; }
     if (b.dataset.ui === "theme") { applyTheme(currentTheme() === "ivory" ? "midnight" : "ivory"); sfx.click(); }
     if (b.dataset.ui === "sound") {
       try { localStorage.setItem(SOUND_KEY, soundOn() ? "off" : "on"); } catch {}

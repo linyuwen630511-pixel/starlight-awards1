@@ -448,3 +448,5 @@ fieldset:disabled .option, fieldset:disabled input { opacity: 0.6; cursor: not-a
   .award-row { grid-template-columns: 1fr; }
   .tie-item { grid-template-columns: 1fr 120px; }
 }
+
+.icon-btn.is-on { background: var(--gold-grad); color: var(--btn-gold-text); border-color: var(--gold); }

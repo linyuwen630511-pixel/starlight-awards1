@@ -24,6 +24,7 @@
       
       <nav class="top-actions">
         <span id="modeBadge" class="mode-badge" hidden></span>
+        <button class="icon-btn" data-ui="music" aria-label="輕鬆背景音樂">♫</button>
         <button class="icon-btn" data-ui="sound" aria-label="音效開關">🔊</button>
         <button class="icon-btn" data-ui="theme" aria-label="切換主題">☾</button>
       </nav>
@@ -33,6 +34,22 @@
       <p class="muted">載入中…</p>
     </main>
   </div>
+    <script>
+    // 載入診斷：若 8 秒後仍停在「載入中」，顯示可能原因
+    window.__loadErrors = [];
+    addEventListener("error", function (e) { window.__loadErrors.push((e.message || "") + " " + (e.filename || (e.target && (e.target.src || e.target.href)) || "")); }, true);
+    addEventListener("unhandledrejection", function (e) { window.__loadErrors.push(String(e.reason && (e.reason.code || e.reason.message) || e.reason)); });
+    setTimeout(function () {
+      var app = document.getElementById("app");
+      if (app && app.textContent.indexOf("載入中") > -1) {
+        app.innerHTML = '<div class="card" style="max-width:640px;margin:6vh auto"><h2>頁面無法載入</h2>' +
+          '<p>可能原因：</p><ol><li><b>config.js 格式錯誤</b>：請檢查每行結尾的逗號、英文半形雙引號，以及 databaseURL 後面不可有斷行的註解。</li>' +
+          '<li><b>檔案沒有上傳齊全</b>：config.js、store.js、ui.js、rules.js、admin.js 等檔案需與 admin.html 在同一層。</li>' +
+          '<li>網路無法連到 gstatic.com（Firebase 程式庫）。</li></ol>' +
+          (window.__loadErrors.length ? '<p style="font-size:13px;color:#a33">錯誤訊息：' + window.__loadErrors.join("；").replace(/</g, "&lt;") + '</p>' : '') + '</div>';
+      }
+    }, 8000);
+  </script>
   <script src="qrcode.js"></script>
   <script src="html2canvas.min.js" defer></script>
   <script src="jspdf.umd.min.js" defer></script>

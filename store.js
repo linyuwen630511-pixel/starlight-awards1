@@ -55,8 +55,10 @@ async function createFirebaseStore() {
     }),
     /** 投票完成後中斷連線，節省免費方案的同時連線數（上限 100） */
     goOffline: () => D.goOffline(db),
+    lastAdminError: null,
     async isAdmin(uid) {
-      try { return (await D.get(r(`admins/${uid}`))).exists(); } catch { return false; }
+      try { this.lastAdminError = null; return (await D.get(r(`admins/${uid}`))).exists(); }
+      catch (e) { this.lastAdminError = e?.code || e?.message || "unknown"; console.warn("isAdmin", e); return false; }
     },
     async get(path) {
       const s = await D.get(r(path));

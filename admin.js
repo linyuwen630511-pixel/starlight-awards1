@@ -12,6 +12,7 @@ import {
 import { computeResults, resultSnapshot, dayNumToDate, TIER_LABEL } from "./results.js";
 import { compressImage, imgTag, hydrateImages, isDbRef, dbId } from "./images.js";
 import { audio } from "./audio.js";
+import { startRelax } from "./ui.js";
 import { csvToCandidates, toCSV, downloadText, CANDIDATE_TEMPLATE_HEADER } from "./csv.js";
 import {
   initChrome, showModeBadge, toast, confirmDialog, openModal, esc, safeUrl, sfx,
@@ -105,9 +106,11 @@ function renderNotAdmin() {
     <div style="max-width:560px;margin:6vh auto 0" class="card">
       <h1 style="font-size:24px">此帳號尚未授權為管理者</h1>
       <p>您已登入為 <b>${esc(S.user.email)}</b>，但此帳號不在管理者名單中。</p>
+      ${S.store.lastAdminError ? `<div class="alert danger"><p>讀取管理者名單失敗（${esc(S.store.lastAdminError)}）。最常見原因是 <b>Realtime Database 的安全規則尚未發布</b>：請到 Realtime Database →「規則」分頁，貼上 database.rules.json 全部內容並按「發布」。</p></div>` : ""}
       <div class="alert info">
-        <p>請由 Firebase 專案擁有者於 Realtime Database 新增下列節點，再重新整理本頁：</p>
-        <p><code>admins/${esc(S.user.uid)}</code> ＝ <code>{ "role": "owner" }</code></p>
+        <p>請到 Firebase → Realtime Database →「資料」分頁，新增下列資料，再重新整理本頁：</p>
+        <p>admins　→　<code>${esc(S.user.uid)}</code>　→　role：<code>owner</code></p>
+        <p style="font-size:13px">注意：中間那層的名稱必須是上面這串 UID（不是 Email），可按下方「複製 UID」貼上。</p>
       </div>
       <div class="row"><button class="btn btn-ghost" data-act="copy" data-text="${esc(S.user.uid)}">複製 UID</button><button class="btn btn-ghost" data-act="logout">登出</button></div>
     </div>`;
@@ -800,10 +803,16 @@ function handleError(e) {
 }
 
 function authErrorMsg(code = "") {
-  if (/invalid-credential|wrong-password|user-not-found|invalid-email/.test(code)) return "帳號或密碼錯誤。";
-  if (/too-many-requests/.test(code)) return "嘗試次數過多，請稍後再試。";
-  if (/network/.test(code)) return "網路連線異常，請稍後再試。";
-  return "登入失敗，請稍後再試。";
+  const tail = code ? `（錯誤代碼：${code}）` : "";
+  if (/invalid-credential|wrong-password|user-not-found|invalid-login/.test(code)) return `帳號或密碼錯誤。請確認是在 Firebase「Authentication → 使用者」建立的 Email 與密碼。${tail}`;
+  if (/invalid-email/.test(code)) return `Email 格式不正確。${tail}`;
+  if (/operation-not-allowed/.test(code)) return `Firebase 尚未啟用「電子郵件／密碼」登入：請到 Authentication → 登入方式 開啟。${tail}`;
+  if (/api-key|invalid-api-key|app-not-authorized|project-not-found|configuration-not-found/.test(code)) return `Firebase 設定（js/config.js）有誤，請重新複製 apiKey、authDomain、projectId。${tail}`;
+  if (/unauthorized-domain/.test(code)) return `此網域尚未授權：請到 Authentication → 設定 → 已授權網域 加入 ${location.hostname}。${tail}`;
+  if (/user-disabled/.test(code)) return `此帳號已被停用。${tail}`;
+  if (/too-many-requests/.test(code)) return `嘗試次數過多，請稍後再試。${tail}`;
+  if (/network/.test(code)) return `網路連線異常，請稍後再試。${tail}`;
+  return `登入失敗。${tail}`;
 }
 
 // ---------------- 事件委派 ----------------
@@ -1051,7 +1060,7 @@ function qrFullscreen() {
       <div class="row" style="justify-content:center"><button class="btn btn-ghost" data-music>♫ 播放輕柔背景音樂</button><button class="btn btn-ghost" data-closeqr>關閉（Esc）</button></div></div>`;
   document.body.appendChild(el);
   el.requestFullscreen?.().catch(() => {});
-  const close = () => { audio.stopBgm(1); el.remove(); document.removeEventListener("keydown", onKey); if (document.fullscreenElement) document.exitFullscreen().catch(() => {}); };
+  const close = () => { audio.stopBgm(1); setTimeout(startRelax, 1100); el.remove(); document.removeEventListener("keydown", onKey); if (document.fullscreenElement) document.exitFullscreen().catch(() => {}); };
   const onKey = (ev) => { if (ev.key === "Escape") close(); };
   document.addEventListener("keydown", onKey);
   el.querySelector("[data-closeqr]").addEventListener("click", close);
