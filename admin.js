@@ -82,6 +82,8 @@ function render() {
 }
 
 // ---------------- 登入 ----------------
+const EYE_OPEN = `<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>`;
+const EYE_SHUT = `<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4 4l16 16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`;
 function renderLogin() {
   const demo = S.store.mode === "demo";
   $app.innerHTML = `
@@ -92,7 +94,9 @@ function renderLogin() {
         ${demo ? `<div class="alert warn"><p><b>本機示範模式</b>：尚未設定 Firebase，資料只保存在此瀏覽器，僅供操作測試，<b>不具安全性</b>。</p><p>示範密碼：<b>starlight2026</b>（帳號可填任意 Email）</p></div>` : ""}
         <form data-form="login" novalidate>
           <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="username" required></div>
-          <div class="field"><label for="pw">密碼</label><input id="pw" name="pw" type="password" autocomplete="current-password" required></div>
+          <div class="field"><label for="pw">密碼</label>
+            <div class="pw-wrap"><input id="pw" name="pw" type="password" autocomplete="current-password" required>
+              <button type="button" class="pw-eye" data-act="toggle-pw" aria-label="顯示密碼" title="顯示密碼">${EYE_OPEN}</button></div></div>
           <div id="loginErr" class="errors"></div>
           <button class="btn btn-gold" style="width:100%" type="submit">登入</button>
         </form>
@@ -821,6 +825,16 @@ $app.addEventListener("click", async (ev) => {
   if (!b || b.disabled) return;
   const { act, id } = b.dataset;
   switch (act) {
+    case "toggle-pw": {
+      const inp = document.getElementById("pw");
+      const show = inp.type === "password";
+      inp.type = show ? "text" : "password";
+      b.innerHTML = show ? EYE_SHUT : EYE_OPEN;
+      b.setAttribute("aria-label", show ? "隱藏密碼" : "顯示密碼");
+      b.title = show ? "隱藏密碼" : "顯示密碼";
+      inp.focus();
+      return;
+    }
     case "new": sfx.click(); return openEditor(null);
     case "edit": sfx.click(); return openEditor(id, b.dataset.tab || "basic");
     case "back": sfx.click(); return closeEditor();
