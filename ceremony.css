@@ -1,0 +1,123 @@
+/* ============================================================
+   星光頒獎舞台（16:9，設計尺寸 1600 × 900，依螢幕等比縮放）
+   ============================================================ */
+.ceremony-body { background: #04071a; overflow: hidden; height: 100vh; }
+.ceremony-body #app { position: fixed; inset: 0; }
+
+.stage-viewport { position: absolute; inset: 0; overflow: hidden; background: #04071a; }
+.stage {
+  position: absolute; left: 50%; top: 50%; width: 1600px; height: 900px; overflow: hidden;
+  transform-origin: center center; transform: translate(-50%, -50%); color: #f6efe1; font-family: var(--font-sans);
+  background:
+    radial-gradient(900px 500px at 50% 18%, rgba(110, 96, 190, 0.35), transparent 70%),
+    radial-gradient(700px 400px at 50% 105%, rgba(214, 167, 67, 0.22), transparent 70%),
+    linear-gradient(180deg, #060a22 0%, #0c1438 55%, #141b44 100%);
+}
+.stage canvas.layer { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.stage .dimmer { position: absolute; inset: 0; background: #000; opacity: 0; transition: opacity 1.6s ease; pointer-events: none; z-index: 3; }
+.stage[data-stage="intro"] .dimmer { opacity: 0.38; }
+.stage[data-stage="bronze"] .dimmer, .stage[data-stage="silver"] .dimmer, .stage[data-stage="gold"] .dimmer { opacity: 0.22; }
+
+/* 標題 */
+.stage-head { position: absolute; top: 34px; left: 0; right: 0; text-align: center; z-index: 8; }
+.stage-head .en { font-family: var(--font-italic); font-style: italic; font-size: 26px; color: #e6c98a; letter-spacing: 0.08em; margin: 0; }
+.stage-head h1 { font-family: var(--font-serif); font-size: 48px; letter-spacing: 0.14em; margin: 2px 0 0; color: #fff6e2; text-shadow: 0 0 24px rgba(240, 207, 122, 0.35); }
+.caption {
+  position: absolute; left: 0; right: 0; top: 150px; text-align: center; z-index: 9;
+  font-family: var(--font-serif); font-weight: 900; font-size: 46px; letter-spacing: 0.2em;
+  background: linear-gradient(135deg, #fff4cf, #e7c27a 50%, #fff0c0); -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 4px 18px rgba(240, 200, 110, 0.45));
+  opacity: 0; transform: translateY(14px) scale(0.96); transition: opacity 0.9s ease, transform 0.9s var(--ease);
+}
+.caption.show { opacity: 1; transform: none; }
+.caption.big { font-size: 74px; }
+
+/* 舞台地板 */
+.floor { position: absolute; left: -10%; right: -10%; bottom: 0; height: 120px; z-index: 4;
+  background: linear-gradient(180deg, rgba(240, 210, 150, 0.16), rgba(10, 14, 40, 0.95) 60%), #0a0f2c;
+  border-top: 2px solid rgba(236, 207, 140, 0.45); box-shadow: 0 -12px 50px rgba(236, 207, 140, 0.18); }
+.floor::after { content: ""; position: absolute; left: 30%; right: 30%; top: 0; height: 60px; background: radial-gradient(ellipse at 50% 0, rgba(255, 230, 170, 0.35), transparent 70%); }
+
+/* 聚光燈 */
+.beam { position: absolute; top: -40px; height: 900px; width: 520px; z-index: 5; pointer-events: none; opacity: 0;
+  clip-path: polygon(44% 0, 56% 0, 100% 100%, 0 100%); mix-blend-mode: screen; transform-origin: 50% 0;
+  transition: opacity 1.1s ease; }
+.beam.bronze { left: 820px; background: linear-gradient(180deg, rgba(255, 190, 130, 0.62), rgba(255, 170, 110, 0.06) 92%); }
+.beam.silver { left: 260px; background: linear-gradient(180deg, rgba(220, 235, 255, 0.62), rgba(210, 225, 255, 0.06) 92%); }
+.beam.gold { left: 540px; width: 520px; background: linear-gradient(180deg, rgba(255, 228, 150, 0.75), rgba(255, 214, 120, 0.08) 92%); }
+.beam.on { opacity: 1; animation: sway 7s ease-in-out infinite; }
+.beam.silver.on { animation-delay: -2s; } .beam.bronze.on { animation-delay: -4s; }
+@keyframes sway { 0%, 100% { transform: rotate(-2.2deg); } 50% { transform: rotate(2.2deg); } }
+.beam-pool { position: absolute; bottom: 92px; width: 380px; height: 70px; border-radius: 50%; z-index: 5; opacity: 0; transition: opacity 1s; filter: blur(8px); }
+.beam-pool.on { opacity: 1; }
+.beam-pool.gold { left: 610px; background: radial-gradient(ellipse, rgba(255, 220, 140, 0.55), transparent 70%); }
+.beam-pool.silver { left: 330px; background: radial-gradient(ellipse, rgba(220, 235, 255, 0.45), transparent 70%); }
+.beam-pool.bronze { left: 890px; background: radial-gradient(ellipse, rgba(255, 180, 120, 0.45), transparent 70%); }
+
+/* 頒獎台（3D） */
+.podiums { position: absolute; left: 0; right: 0; bottom: 92px; height: 640px; z-index: 6; overflow: hidden; }
+.podium { position: absolute; bottom: 0; width: 280px; transform-style: preserve-3d; transform: perspective(1400px) translateY(110%); transition: transform 1.6s cubic-bezier(0.2, 0.9, 0.25, 1.05); }
+.podium.silver { left: 380px; height: 200px; }
+.podium.gold { left: 660px; height: 270px; }
+.podium.bronze { left: 940px; height: 155px; }
+.podium.up { transform: perspective(1400px) translateY(0); }
+.podium .front { position: absolute; inset: 0; border-radius: 4px 4px 0 0; display: grid; place-items: center; overflow: hidden;
+  box-shadow: inset 0 0 0 2px rgba(255, 240, 200, 0.35), inset 0 -40px 60px rgba(0, 0, 0, 0.25); }
+.podium .top { position: absolute; left: 0; right: 0; bottom: 100%; height: 70px; transform-origin: 50% 100%; transform: rotateX(78deg); border-radius: 4px; }
+.podium .num { font-family: var(--font-italic); font-style: italic; font-weight: 700; font-size: 110px; line-height: 1; opacity: 0.9; }
+.podium .front::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 10px; }
+.podium.gold .front { background: linear-gradient(90deg, #8d6620, #d9ae55 30%, #f5dc9b 50%, #d9ae55 70%, #8d6620); color: #5a3f0c; }
+.podium.gold .top { background: linear-gradient(180deg, #fbe8b4, #e3bf6c); }
+.podium.silver .front { background: linear-gradient(90deg, #6c7482, #bcc5d2 30%, #eef2f7 50%, #bcc5d2 70%, #6c7482); color: #444b57; }
+.podium.silver .top { background: linear-gradient(180deg, #ffffff, #cfd6e0); }
+.podium.bronze .front { background: linear-gradient(90deg, #6b3a16, #b8733f 30%, #e7ad80 50%, #b8733f 70%, #6b3a16); color: #4a2309; }
+.podium.bronze .top { background: linear-gradient(180deg, #f4c7a1, #c98451); }
+
+/* 獎盃 */
+.trophy-slot { position: absolute; z-index: 7; display: grid; justify-items: center; pointer-events: none;
+  opacity: 0; transform: translateY(80px) scale(0.55); transition: opacity 1s ease 0.9s, transform 1.4s cubic-bezier(0.2, 1.2, 0.3, 1) 0.9s; }
+.trophy-slot.show { opacity: 1; transform: none; }
+.trophy-slot.silver { left: 430px; bottom: 312px; }
+.trophy-slot.gold { left: 695px; bottom: 382px; }
+.trophy-slot.bronze { left: 995px; bottom: 267px; }
+.trophy-xl { display: block; filter: drop-shadow(0 18px 24px rgba(0, 0, 0, 0.45)); }
+.trophy-slot.show .trophy-glow { animation: glow 3s ease-in-out infinite; transform-origin: 100px 100px; }
+.trophy-slot.show .trophy-twinkle { animation: twinkle 2.2s ease-in-out infinite; transform-origin: 150px 28px; }
+@keyframes glow { 0%, 100% { opacity: 0.55; transform: scale(0.92); } 50% { opacity: 1; transform: scale(1.06); } }
+@keyframes twinkle { 0%, 100% { opacity: 0.2; transform: scale(0.6); } 50% { opacity: 1; transform: scale(1.15); } }
+
+/* 得獎資訊卡（位於頒獎台正面） */
+.podium .num { position: absolute; right: 10px; top: -18px; font-size: 170px; opacity: 0.16; }
+.winner { position: relative; z-index: 2; width: 100%; padding: 0 14px; text-align: center;
+  opacity: 0; transform: translateY(12px); transition: opacity 0.9s ease 1.4s, transform 0.9s var(--ease) 1.4s; }
+.winner.show { opacity: 1; transform: none; }
+.winner .tier { display: inline-block; padding: 2px 14px; border-radius: 999px; font-weight: 700; font-size: 15px; letter-spacing: 0.2em; margin-bottom: 4px; background: rgba(255, 255, 255, 0.55); }
+.winner .names { font-family: var(--font-serif); font-weight: 900; font-size: 26px; line-height: 1.22; }
+.podium.gold .winner .names { font-size: 32px; }
+.podium.bronze .winner .names { font-size: 23px; }
+.winner .work { font-size: 15px; margin-top: 2px; opacity: 0.9; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.winner .votes { font-family: var(--font-italic); font-style: italic; font-weight: 700; font-size: 20px; }
+.winner .vacant { font-size: 17px; font-weight: 700; }
+.winner .multi { font-size: 13px; font-weight: 700; }
+.stage[data-stage="all"] .caption { font-size: 44px; }
+
+/* 開場遮罩（啟用音效） */
+.start-overlay { position: absolute; inset: 0; z-index: 30; display: grid; place-items: center; background: rgba(4, 7, 26, 0.86); color: #f6efe1; text-align: center; cursor: pointer; }
+.start-overlay .big { font-size: 64px; color: #e6c98a; }
+.start-overlay h2 { font-family: var(--font-serif); font-size: 40px; letter-spacing: 0.12em; margin: 8px 0; }
+
+/* 控制列 */
+.cer-controls { position: fixed; left: 50%; bottom: 12px; transform: translateX(-50%); z-index: 40; width: max-content; max-width: calc(100% - 24px);
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center;
+  padding: 10px 14px; border-radius: 22px; background: rgba(14, 20, 52, 0.86); border: 1px solid rgba(236, 207, 140, 0.35);
+  backdrop-filter: blur(10px); box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45); transition: opacity 0.3s, transform 0.3s; }
+.cer-controls.hidden { opacity: 0; transform: translate(-50%, 140%); pointer-events: none; }
+.cer-controls .sep { width: 1px; height: 30px; background: rgba(236, 207, 140, 0.3); }
+.cer-controls .btn { min-height: 38px; padding: 6px 13px; font-size: 14px; letter-spacing: 0.02em; }
+.cer-controls .btn-ghost { background: rgba(255, 255, 255, 0.08); color: #f3ead8; border-color: rgba(236, 207, 140, 0.35); }
+.cer-controls .btn.next { box-shadow: 0 0 0 3px rgba(240, 210, 140, 0.45), 0 8px 22px rgba(214, 167, 67, 0.35); }
+.cer-controls label { display: inline-flex; align-items: center; gap: 6px; color: #e8dfcc; font-size: 13.5px; }
+.cer-controls input[type="range"] { width: 90px; accent-color: #d4a743; }
+.show-controls { position: fixed; right: 14px; bottom: 14px; z-index: 39; opacity: 0.35; }
+.show-controls:hover { opacity: 1; }
+.cer-msg { position: fixed; inset: 0; display: grid; place-items: center; padding: 24px; }

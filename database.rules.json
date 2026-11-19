@@ -1,0 +1,282 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "admins": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": false
+      }
+    },
+    "codes": {
+      "$code": {
+        ".read": true,
+        ".write": "auth != null && root.child('admins').child(auth.uid).exists()",
+        ".validate": "$code.matches(/^[A-Z0-9]{6}$/) && newData.isString() && newData.val().length <= 64"
+      }
+    },
+    "events": {
+      ".read": "auth != null && root.child('admins').child(auth.uid).exists()",
+      "$eventId": {
+        ".read": "data.exists() && data.child('status').val() !== 'draft'",
+        ".write": "auth != null && root.child('admins').child(auth.uid).exists()",
+        ".validate": "newData.hasChildren(['title','status','rules','timezone','code'])",
+        "title": {
+          ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 80"
+        },
+        "subtitle": {
+          ".validate": "newData.isString() && newData.val().length <= 120"
+        },
+        "description": {
+          ".validate": "newData.isString() && newData.val().length <= 2000"
+        },
+        "date": {
+          ".validate": "newData.isString() && (newData.val() === '' || newData.val().matches(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/))"
+        },
+        "organizer": {
+          ".validate": "newData.isString() && newData.val().length <= 80"
+        },
+        "coverUrl": {
+          ".validate": "newData.isString() && newData.val().length <= 500 && (newData.val() === '' || newData.val().beginsWith('https://') || newData.val().beginsWith('http://'))"
+        },
+        "status": {
+          ".validate": "newData.isString() && newData.val().matches(/^(draft|ready|open|paused|closed|revealing|completed)$/) && (newData.val() !== 'open' || newData.parent().hasChildren(['slots','lastSlot']))"
+        },
+        "timezone": {
+          ".validate": "newData.val() === 'Asia/Taipei'"
+        },
+        "code": {
+          ".validate": "newData.isString() && newData.val().matches(/^[A-Z0-9]{6}$/) && (!data.exists() || newData.val() === data.val())"
+        },
+        "createdAt": {
+          ".validate": "newData.isNumber()"
+        },
+        "updatedAt": {
+          ".validate": "newData.isNumber()"
+        },
+        "startedAt": {
+          ".validate": "newData.isNumber()"
+        },
+        "closedAt": {
+          ".validate": "newData.isNumber()"
+        },
+        "createdBy": {
+          ".validate": "newData.isString() && newData.val().length <= 128"
+        },
+        "restrictEmails": {
+          ".validate": "newData.isBoolean() && (!data.exists() || newData.val() === data.val() || (root.child('events').child($eventId).child('status').val() === 'draft' || root.child('events').child($eventId).child('status').val() === 'ready' || !root.child('events').child($eventId).exists()))"
+        },
+        "runoffFor": {
+          ".validate": "newData.isString() && newData.val().length <= 40"
+        },
+        "lastSlot": {
+          ".validate": "newData.isString() && newData.val().matches(/^s[0-9]{1,2}$/) && (!data.exists() || newData.val() === data.val() || (root.child('events').child($eventId).child('status').val() === 'draft' || root.child('events').child($eventId).child('status').val() === 'ready' || !root.child('events').child($eventId).exists()))"
+        },
+        "slots": {
+          ".validate": "newData.hasChild('s0') && (!data.exists() || newData.val() === data.val() || (root.child('events').child($eventId).child('status').val() === 'draft' || root.child('events').child($eventId).child('status').val() === 'ready' || !root.child('events').child($eventId).exists()))",
+          "$s": {
+            ".validate": "$s.matches(/^s[0-9]{1,2}$/) && newData.isString() && (newData.val() === '-' || newData.val().matches(/^s[0-9]{1,2}$/))"
+          }
+        },
+        "rules": {
+          ".validate": "newData.hasChildren(['votesPerVoter','allowRepeat','frequency','mustFill','showcase','identity','tieRule','hidePublicRanking'])",
+          "votesPerVoter": {
+            ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 100 && newData.val() % 1 === 0 && (!data.exists() || newData.val() === data.val() || (root.child('events').child($eventId).child('status').val() === 'draft' || root.child('events').child($eventId).child('status').val() === 'ready' || !root.child('events').child($eventId).exists()))"
+          },
+          "allowRepeat": {
+            ".validate": "newData.isBoolean() && (!data.exists() || newData.val() === data.val() || (root.child('events').child($eventId).child('status').val() === 'draft' || root.child('events').child($eventId).child('status').val() === 'ready' || !root.child('events').child($eventId).exists()))"
+          },
+          "frequency": {
+            ".validate": "newData.val() === 'once' || newData.val() === 'daily' && (!data.exists() || newData.val() === data.val() || (root.child('events').child($eventId).child('status').val() === 'draft' || root.child('events').child($eventId).child('status').val() === 'ready' || !root.child('events').child($eventId).exists()))"
+          },
+          "mustFill": {
+            ".validate": "newData.isBoolean() && (!data.exists() || newData.val() === data.val() || (root.child('events').child($eventId).child('status').val() === 'draft' || root.child('events').child($eventId).child('status').val() === 'ready' || !root.child('events').child($eventId).exists()))"
+          },
+          "showcase": {
+            ".validate": "newData.val() === 'images' || newData.val() === 'none' && (!data.exists() || newData.val() === data.val() || (root.child('events').child($eventId).child('status').val() === 'draft' || root.child('events').child($eventId).child('status').val() === 'ready' || !root.child('events').child($eventId).exists()))"
+          },
+          "identity": {
+            ".validate": "newData.val() === 'anonymous' || newData.val() === 'code' || newData.val() === 'account' && (!data.exists() || newData.val() === data.val() || (root.child('events').child($eventId).child('status').val() === 'draft' || root.child('events').child($eventId).child('status').val() === 'ready' || !root.child('events').child($eventId).exists()))"
+          },
+          "tieRule": {
+            ".validate": "newData.val() === 'shared' || newData.val() === 'runoff' || newData.val() === 'judges' && (!data.exists() || newData.val() === data.val() || (root.child('events').child($eventId).child('status').val() === 'draft' || root.child('events').child($eventId).child('status').val() === 'ready' || !root.child('events').child($eventId).exists()))"
+          },
+          "hidePublicRanking": {
+            ".validate": "newData.val() === true"
+          },
+          "$other": {
+            ".validate": false
+          }
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
+    "candidates": {
+      "$eventId": {
+        ".read": "(auth != null && root.child('admins').child(auth.uid).exists()) || (root.child('events').child($eventId).exists() && root.child('events').child($eventId).child('status').val() !== 'draft')",
+        ".write": "(auth != null && root.child('admins').child(auth.uid).exists()) && ((root.child('events').child($eventId).child('status').val() === 'draft' || root.child('events').child($eventId).child('status').val() === 'ready' || !root.child('events').child($eventId).exists()) || !newData.exists())",
+        "$cid": {
+          ".validate": "newData.hasChildren(['name','order','active'])",
+          "eventId": {
+            ".validate": "newData.val() === $eventId"
+          },
+          "code": {
+            ".validate": "newData.isString() && newData.val().length <= 12"
+          },
+          "name": {
+            ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 80"
+          },
+          "members": {
+            ".validate": "newData.isString() && newData.val().length <= 200"
+          },
+          "workTitle": {
+            ".validate": "newData.isString() && newData.val().length <= 120"
+          },
+          "description": {
+            ".validate": "newData.isString() && newData.val().length <= 2000"
+          },
+          "order": {
+            ".validate": "newData.isNumber()"
+          },
+          "active": {
+            ".validate": "newData.isBoolean()"
+          },
+          "createdAt": {
+            ".validate": "newData.isNumber()"
+          },
+          "updatedAt": {
+            ".validate": "newData.isNumber()"
+          },
+          "imageUrls": {
+            "$i": {
+              ".validate": "$i.matches(/^[0-4]$/) && newData.isString() && newData.val().length <= 1000 && (newData.val().beginsWith('https://') || newData.val().beginsWith('http://') || newData.val().matches(/^db:[-_A-Za-z0-9]{1,40}$/))"
+            }
+          },
+          "sourceId": {
+            ".validate": "newData.isString() && newData.val().length <= 40"
+          },
+          "$other": {
+            ".validate": false
+          }
+        }
+      }
+    },
+    "voterState": {
+      "$eventId": {
+        ".read": "auth != null && root.child('admins').child(auth.uid).exists()",
+        "$voter": {
+          ".read": "(auth != null && root.child('admins').child(auth.uid).exists()) || (auth != null && (auth.uid === $voter || root.child('voterCodes').child($eventId).child($voter).exists()))",
+          ".write": "((auth != null && root.child('admins').child(auth.uid).exists()) && !newData.exists()) || (auth != null && root.child('events').child($eventId).child('status').val() === 'open' && ((root.child('events').child($eventId).child('rules').child('identity').val() === 'anonymous' && $voter === auth.uid) || (root.child('events').child($eventId).child('rules').child('identity').val() === 'account' && $voter === auth.uid && auth.provider !== 'anonymous' && auth.token.email_verified === true && (root.child('events').child($eventId).child('restrictEmails').val() !== true || root.child('eligible').child($eventId).child(auth.token.email.replace('.', ',')).exists())) || (root.child('events').child($eventId).child('rules').child('identity').val() === 'code' && root.child('voterCodes').child($eventId).child($voter).exists())) && newData.exists())",
+          ".validate": "newData.hasChildren(['lastDay','lastBallot','ts']) && ((root.child('events').child($eventId).child('rules').child('frequency').val() === 'once' && !data.exists()) || (root.child('events').child($eventId).child('rules').child('frequency').val() === 'daily' && (!data.exists() || newData.child('lastDay').val() > data.child('lastDay').val()))) && newData.child('lastDay').isNumber() && newData.child('lastDay').val() % 1 === 0 && newData.child('lastDay').val() * 86400000 <= now + 28800000 && now + 28800000 < newData.child('lastDay').val() * 86400000 + 86400000 && newData.parent().parent().parent().child('ballots').child($eventId).child($voter).child(newData.child('lastBallot').val()).exists()",
+          "lastDay": {
+            ".validate": "newData.isNumber()"
+          },
+          "lastBallot": {
+            ".validate": "newData.isString() && newData.val().length <= 40"
+          },
+          "ts": {
+            ".validate": "newData.val() === now"
+          },
+          "$other": {
+            ".validate": false
+          }
+        }
+      }
+    },
+    "ballots": {
+      "$eventId": {
+        ".read": "auth != null && root.child('admins').child(auth.uid).exists()",
+        ".write": "(auth != null && root.child('admins').child(auth.uid).exists()) && !newData.exists()",
+        "$voter": {
+          "$bid": {
+            ".write": "!data.exists() && auth != null && root.child('events').child($eventId).child('status').val() === 'open' && ((root.child('events').child($eventId).child('rules').child('identity').val() === 'anonymous' && $voter === auth.uid) || (root.child('events').child($eventId).child('rules').child('identity').val() === 'account' && $voter === auth.uid && auth.provider !== 'anonymous' && auth.token.email_verified === true && (root.child('events').child($eventId).child('restrictEmails').val() !== true || root.child('eligible').child($eventId).child(auth.token.email.replace('.', ',')).exists())) || (root.child('events').child($eventId).child('rules').child('identity').val() === 'code' && root.child('voterCodes').child($eventId).child($voter).exists())) && newData.exists()",
+            ".validate": "newData.hasChildren(['dayNum','ts','slots']) && newData.parent().parent().parent().parent().child('voterState').child($eventId).child($voter).child('lastBallot').val() === $bid && newData.parent().parent().parent().parent().child('voterState').child($eventId).child($voter).child('lastDay').val() === newData.child('dayNum').val() && ((root.child('events').child($eventId).child('rules').child('mustFill').val() === true && newData.child('slots').child(root.child('events').child($eventId).child('lastSlot').val()).exists()) || (root.child('events').child($eventId).child('rules').child('mustFill').val() === false && newData.child('slots').child('s0').exists())) && ((root.child('events').child($eventId).child('rules').child('allowRepeat').val() === true && !newData.hasChild('picks')) || (root.child('events').child($eventId).child('rules').child('allowRepeat').val() === false && newData.hasChild('picks')))",
+            "dayNum": {
+              ".validate": "newData.isNumber()"
+            },
+            "ts": {
+              ".validate": "newData.val() === now"
+            },
+            "slots": {
+              "$s": {
+                ".validate": "newData.isString() && root.child('events').child($eventId).child('slots').child($s).exists() && (root.child('events').child($eventId).child('slots').child($s).val() === '-' || newData.parent().child(root.child('events').child($eventId).child('slots').child($s).val()).exists()) && root.child('candidates').child($eventId).child(newData.val()).child('active').val() === true && (root.child('events').child($eventId).child('rules').child('allowRepeat').val() === true || newData.parent().parent().child('picks').child(newData.val()).val() === $s)"
+              }
+            },
+            "picks": {
+              "$cid": {
+                ".validate": "newData.isString() && newData.parent().parent().child('slots').child(newData.val()).val() === $cid"
+              }
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        }
+      }
+    },
+    "voterCodes": {
+      "$eventId": {
+        ".read": "auth != null && root.child('admins').child(auth.uid).exists()",
+        ".write": "auth != null && root.child('admins').child(auth.uid).exists()",
+        "$code": {
+          ".validate": "$code.matches(/^[A-Z0-9]{8}$/) && newData.val() === true"
+        }
+      }
+    },
+    "eligible": {
+      "$eventId": {
+        ".read": "auth != null && root.child('admins').child(auth.uid).exists()",
+        ".write": "auth != null && root.child('admins').child(auth.uid).exists()",
+        "$key": {
+          ".validate": "newData.val() === true && $key.length <= 200"
+        }
+      }
+    },
+    "images": {
+      "$eventId": {
+        ".read": "(auth != null && root.child('admins').child(auth.uid).exists()) || (root.child('events').child($eventId).exists() && root.child('events').child($eventId).child('status').val() !== 'draft')",
+        ".write": "(auth != null && root.child('admins').child(auth.uid).exists()) && ((root.child('events').child($eventId).child('status').val() === 'draft' || root.child('events').child($eventId).child('status').val() === 'ready' || !root.child('events').child($eventId).exists()) || !newData.exists())",
+        "$cid": {
+          "$img": {
+            ".validate": "newData.hasChildren(['full','thumb'])",
+            "full": {
+              ".validate": "newData.isString() && newData.val().beginsWith('data:image/') && newData.val().length <= 420000"
+            },
+            "thumb": {
+              ".validate": "newData.isString() && newData.val().beginsWith('data:image/') && newData.val().length <= 90000"
+            },
+            "w": {
+              ".validate": "newData.isNumber()"
+            },
+            "h": {
+              ".validate": "newData.isNumber()"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        }
+      }
+    },
+    "tiebreak": {
+      "$eventId": {
+        ".read": "auth != null && root.child('admins').child(auth.uid).exists()",
+        ".write": "auth != null && root.child('admins').child(auth.uid).exists()"
+      }
+    },
+    "results": {
+      "$eventId": {
+        ".read": "auth != null && root.child('admins').child(auth.uid).exists()",
+        ".write": "auth != null && root.child('admins').child(auth.uid).exists()"
+      }
+    },
+    "awards": {
+      "$eventId": {
+        ".read": "auth != null && root.child('admins').child(auth.uid).exists()",
+        ".write": "auth != null && root.child('admins').child(auth.uid).exists()"
+      }
+    }
+  }
+}

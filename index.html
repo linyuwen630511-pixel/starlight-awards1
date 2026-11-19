@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW" data-theme="ivory">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>星光榮耀｜Starlight Awards</title>
+  <meta name="description" content="星光榮耀｜QR Code 互動投票與頒獎平台 — 每一份努力，都值得被看見。">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>★</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <canvas id="starfield" aria-hidden="true"></canvas>
+  <div class="page">
+    <div class="topbar-wrap">
+    <header class="topbar">
+      <a class="brand" href="index.html" aria-label="星光榮耀首頁">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="brandGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ecd29b"/><stop offset=".55" stop-color="#c9a052"/><stop offset="1" stop-color="#a87a2c"/></linearGradient></defs><path d="M16 1c1.2 8.6 6.4 13.8 15 15-8.6 1.2-13.8 6.4-15 15-1.2-8.6-6.4-13.8-15-15C9.6 14.8 14.8 9.6 16 1z"/></svg>
+        <b>星光榮耀</b><span class="divider"></span><span class="it">Starlight Awards</span>
+      </a>
+      <nav class="nav" aria-label="主要選單">
+        <a href="admin.html#new">建立活動</a>
+        <a href="vote.html">進入投票</a>
+        <a href="admin.html#stats">投票統計</a>
+        <a href="admin.html#ceremony">頒獎典禮</a>
+      </nav>
+      <nav class="top-actions">
+        <span id="modeBadge" class="mode-badge" hidden></span>
+        <button class="icon-btn" data-ui="sound" aria-label="音效開關">🔊</button>
+        <button class="icon-btn" data-ui="theme" aria-label="切換主題">☾</button>
+      </nav>
+    </header>
+    </div>
+
+    <main class="container">
+      <section class="hero">
+        <div class="hero-text">
+          <p class="eyebrow">Every effort deserves to shine</p>
+          <h1>星光榮耀<span class="spark">✦</span></h1>
+          <p class="it">Starlight Awards</p>
+          <p class="tagline">每一份努力，都值得被看見。</p>
+          <p class="sub">QR Code 投票・作品展示・即時統計・榮耀頒獎</p>
+          <a class="btn btn-gold btn-lg" href="admin.html#new">建立投票活動 <span class="arrow">↗</span></a>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <svg viewBox="0 0 560 340">
+            <defs>
+              <linearGradient id="hg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f6e2b0"/><stop offset=".5" stop-color="#d6b064"/><stop offset="1" stop-color="#b58835"/></linearGradient>
+              <linearGradient id="hgV" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3dca4"/><stop offset="1" stop-color="#b9893a"/></linearGradient>
+              <linearGradient id="pBlue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dcebf7"/><stop offset="1" stop-color="#b9d3ea"/></linearGradient>
+              <linearGradient id="pCream" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fffaf0"/><stop offset="1" stop-color="#f1e3c6"/></linearGradient>
+              <linearGradient id="pPink" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbe2e7"/><stop offset="1" stop-color="#f0c3cd"/></linearGradient>
+              <radialGradient id="cup" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#fff6d8"/><stop offset=".45" stop-color="#e2c27a"/><stop offset="1" stop-color="#a87a2c"/></radialGradient>
+              <filter id="soft" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="8" stdDeviation="9" flood-color="#9d7a45" flood-opacity=".18"/></filter>
+            </defs>
+            <path d="M120 150 C 190 40, 370 40, 440 150" fill="none" stroke="url(#hg)" stroke-width="2" opacity=".75"/>
+            <g fill="url(#hg)">
+              <path d="M96 92c1 8 5 12 13 13-8 1-12 5-13 13-1-8-5-12-13-13 8-1 12-5 13-13z"/>
+              <path d="M470 120c.8 6 4 9 10 10-6 .8-9 4-10 10-.8-6-4-9-10-10 6-.8 9-4 10-10z"/>
+              <path d="M418 48c.6 4.5 3 7 7.5 7.5-4.5.6-7 3-7.5 7.5-.6-4.5-3-7-7.5-7.5 4.5-.6 7-3 7.5-7.5z"/>
+              <path d="M160 40c.6 4.5 3 7 7.5 7.5-4.5.6-7 3-7.5 7.5-.6-4.5-3-7-7.5-7.5 4.5-.6 7-3 7.5-7.5z"/>
+            </g>
+            <g fill="none" stroke="#a9bf92" stroke-width="2.4" stroke-linecap="round">
+              <path d="M70 330 C 72 290, 84 262, 104 240"/><path d="M490 330 C 488 292, 476 266, 458 246"/>
+            </g>
+            <g fill="#c9dcb6">
+              <ellipse cx="82" cy="292" rx="15" ry="6.5" transform="rotate(-50 82 292)"/><ellipse cx="94" cy="262" rx="13" ry="5.5" transform="rotate(-35 94 262)"/>
+              <ellipse cx="62" cy="304" rx="13" ry="5.5" transform="rotate(-120 62 304)"/>
+              <ellipse cx="478" cy="294" rx="15" ry="6.5" transform="rotate(50 478 294)"/><ellipse cx="466" cy="266" rx="13" ry="5.5" transform="rotate(35 466 266)"/>
+              <ellipse cx="497" cy="306" rx="13" ry="5.5" transform="rotate(120 497 306)"/>
+            </g>
+            <g filter="url(#soft)">
+              <rect x="130" y="238" width="104" height="96" rx="12" fill="url(#pBlue)" stroke="url(#hgV)" stroke-width="2"/>
+              <rect x="228" y="200" width="104" height="134" rx="12" fill="url(#pCream)" stroke="url(#hgV)" stroke-width="2"/>
+              <rect x="326" y="258" width="104" height="76" rx="12" fill="url(#pPink)" stroke="url(#hgV)" stroke-width="2"/>
+            </g>
+            <g font-family="Cormorant Garamond, Georgia, serif" font-style="italic" font-weight="600" fill="#b58835" text-anchor="middle">
+              <text x="182" y="296" font-size="38">2</text><text x="280" y="276" font-size="46">1</text><text x="378" y="306" font-size="34">3</text>
+            </g>
+            <g filter="url(#soft)">
+              <path d="M252 104h56v20c0 22-12 36-28 39-16-3-28-17-28-39z" fill="url(#cup)"/>
+              <path d="M252 110h-16c0 16 8 25 19 27M308 110h16c0 16-8 25-19 27" fill="none" stroke="url(#hg)" stroke-width="5" stroke-linecap="round"/>
+              <rect x="273" y="162" width="14" height="16" fill="url(#hgV)"/>
+              <path d="M258 178h44l5 16h-54z" fill="url(#hgV)"/>
+              <rect x="252" y="193" width="56" height="8" rx="3" fill="#a87a2c"/>
+              <path d="M280 116l3.6 7.4 8.2 1.2-5.9 5.8 1.4 8.1-7.3-3.8-7.3 3.8 1.4-8.1-5.9-5.8 8.2-1.2z" fill="#fff9e8"/>
+            </g>
+            <g filter="url(#soft)">
+              <circle cx="182" cy="214" r="17" fill="url(#cup)" opacity=".75"/><path d="M172 196l10 12 10-12" fill="none" stroke="#b9d3ea" stroke-width="6"/>
+              <circle cx="378" cy="236" r="15" fill="#d9a67a"/><path d="M369 220l9 10 9-10" fill="none" stroke="#f0c3cd" stroke-width="6"/>
+            </g>
+          </svg>
+        </div>
+      </section>
+
+      <div class="section-head">
+        <p class="eyebrow">Find your stage</p>
+        <h2>從建立活動到頒獎，一站完成</h2>
+      </div>
+      <section class="entry-grid" aria-label="主要入口">
+        <a class="card entry" href="admin.html#new">
+          <span class="num">i</span>
+          <span class="icon">✦</span>
+          <h2>建立投票活動</h2>
+          <p>建立活動、自訂投票規則、管理候選人與作品。</p>
+          <span class="go">管理者登入 →</span>
+        </a>
+        <a class="card entry" href="vote.html">
+          <span class="num">ii</span>
+          <span class="icon">⌗</span>
+          <h2>進入投票</h2>
+          <p>掃描 QR Code，或輸入活動代碼進入投票頁面。</p>
+          <span class="go">輸入活動代碼 →</span>
+        </a>
+        <a class="card entry" href="admin.html#stats">
+          <span class="num">iii</span>
+          <span class="icon">▤</span>
+          <h2>投票統計</h2>
+          <p>查看投票進度、有效票數與最終結果（限管理者）。</p>
+          <span class="go">查看統計 →</span>
+        </a>
+        <a class="card entry" href="admin.html#ceremony">
+          <span class="num">iv</span>
+          <span class="icon">♕</span>
+          <h2>榮耀頒獎典禮</h2>
+          <p>於星光舞台逐一揭曉銅獎、銀獎與金獎（限管理者）。</p>
+          <span class="go">進入典禮 →</span>
+        </a>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span class="it">Starlight Awards</span>　·　投票期間一律不公開即時票數與排名
+    </footer>
+  </div>
+
+  <script type="module">
+    import { initChrome, showModeBadge } from "./js/ui.js";
+    import { getStore } from "./js/store.js";
+    initChrome();
+    getStore().then((s) => showModeBadge(s.mode)).catch(() => {});
+  </script>
+</body>
+</html>
