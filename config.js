@@ -7,13 +7,13 @@
 // ============================================================
 
 export const FIREBASE_CONFIG = {
-  apiKey: "",
-  authDomain: "",
-  databaseURL: "",        // 例：https://your-project-default-rtdb.asia-southeast1.firebasedatabase.app
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: ""
+  apiKey: "AIzaSyB6sEiK_CvASJrNBfr92Q2DWtkf-bieHKM",
+  authDomain: "starlight-awards-f6879.firebaseapp.com",
+  databaseURL: "https://starlight-awards-f6879-default-rtdb.asia-southeast1.firebasedatabase.app",        
+  projectId: "starlight-awards-f6879",
+  storageBucket: "starlight-awards-f6879.firebasestorage.app",
+  messagingSenderId: "298667527130",
+  appId: "1:298667527130:web:df4f10f58841fa4eb40ee3"
 };
 
 export const APP_CONFIG = {
